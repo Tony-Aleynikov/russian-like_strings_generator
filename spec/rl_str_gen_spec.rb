@@ -44,7 +44,9 @@ describe rl_str_gen do
   it "should allow only particular signs after words with in sentence" do
     1000.times do
       with_in = rl_str_gen.split.reject { |el| el == "-" }[0..-2]
-      expect(with_in.select { |el| el[-1].match? /[^,:\"\'a-яё]/ }.size).to eq(0)
+      expect(with_in.reject { |el| el.match? /[а-яё][\'\"]?[,:;]?\z/i }
+                    .size)
+                    .to eq(0)
     end
   end
 
@@ -59,18 +61,21 @@ describe rl_str_gen do
 
   it "should not allow unwanted symbols inside words" do
     1000.times do
-      expect(rl_str_gen.match? /[а-яё-][^а-яё -]+[а-яё-]/).to be false
+      expect(rl_str_gen.match? (/[а-яё-][^а-яё -]+[а-яё-]/)).to be false
     end
-  end
-
-
-  it "should not allow multiple punctuation marks" do
-
   end
 
 
   it "should not allow multiple dashes" do
 
+  end
+
+
+  it "should exclude unwanted simbols before words" do
+    1000.times do
+      expect(rl_str_gen.match? (/(?<![а-яё])[^ \'\"а-яё]+\b[а-яё]/i))
+                       .to be false
+    end
   end
 
 end
