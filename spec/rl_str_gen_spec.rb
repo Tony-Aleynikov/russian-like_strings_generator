@@ -156,7 +156,7 @@ describe "rl_str_gen" do
   it "shoud allow only particular one-letter words" do
     1000.times do
       rl_str_gen.scan(/\b[а-яё]\b/i).each do |word|
-        expect(word).to match(/[аявоуиксжб]/i)
+        expect(word).to match(/[аявоуикс]/i)
       end
     end
   end
@@ -223,7 +223,7 @@ describe "rl_str_gen" do
     1000.times do
       rl_str_gen.gsub(/[^а-яё -]/i, "")
                 .split
-                .reject { |w| w.match?(/-|[аоуэыияеёю].*[аоуэыияеёю]|/i) ||
+                .reject { |w| w.match?(/-|([аоуэыияеёю].*[аоуэыияеёю])/i) ||
                               w.match?(/\A[А-ЯЁ]{2,}\z/)  }
                 .each do |word|
                   expect(word.size).to be <= 6
