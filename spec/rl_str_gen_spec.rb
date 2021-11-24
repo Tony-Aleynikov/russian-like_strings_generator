@@ -1,7 +1,12 @@
 require "rspec"
 require_relative "../app/methods"
 
-describe "rl_str_gen" do
+describe "nested methods" do
+  it "" do
+  end
+end
+
+describe "resulting sentense" do
 
 
   it "should return a string" do

@@ -45,6 +45,12 @@ ONE_LETTER_WORDS_FREQ = { 1080 => 358,
                         }.freeze
 
 
+VOWELS     = [1072, 1077, 1080, 1086, 1091, 1099, 1101, 1102, 1103, 1105]
+
+CONSONANTS = [1073, 1074, 1075, 1076, 1078, 1079, 1081,
+              1082, 1083, 1084, 1085, 1087, 1088, 1089,
+              1090, 1092, 1093, 1094, 1095, 1096, 1097]
+
 
 def provide_disrtibution(hash)
   sample_array = []
@@ -59,15 +65,24 @@ def provide_disrtibution(hash)
 end
 
 
+def select_letters(arr)
+  LETTERS_FREQ.select { |k, v| arr.any?(k) }
+end
+
+
 ONE_LETTER_WORDS_PROBABILITY_ARRAY = provide_disrtibution(ONE_LETTER_WORDS_FREQ)
-LETTERS_PROBABILITY_ARRAY          = provide_disrtibution(LETTERS_FREQ)
+
+VOWELS_PROBABILITY_ARRAY     = provide_disrtibution(select_letters(VOWELS))
+
+CONSONANTS_PROBABILITY_ARRAY = provide_disrtibution(select_letters(CONSONANTS))
+
 
 
 
 
 
 def rl_str_gen #russian like strings generator
-  base_string
+  words_gen(plan_words).map { |a| a << 32 }.flatten[0..-2].pack("U*")
 end
 
 
@@ -120,6 +135,10 @@ end
 
 
 def words_gen(arr)
+ # получаем массив с хэшами где описаны свойсва будущих слов.
+ # Согласно этим условиям создаем производный массив где каждый элемент
+ # является массивом с интеджерами, который в будущем станет словом.
+
   arr.map do |el|
     case el[:case]
     when :acronym
@@ -141,30 +160,16 @@ end
 
 
 def make_common_word(hash)
-# !ъьы в начале слова
-# в начале слова после !й всегла гласная
-# после !й в среедине слова определенные буквы
-# в 2 и 3 буквенных всегда гласная
-# однобукв слова только некоторые
-# не оболее 4 согл подряд
-# больше 2 гласных подряд нельзя
-# больше двух одинаковых согласных подряд нельзя
-# в многослож словах не менее 40% гласных
-# 5 или меньше согласных в односложных словах
-# после !ъ яёюе
-# не более ..."should not allow a vowel add the beginning of the word in single-syllable words if they have 3 or more letters"
-
-
 
   if hash[:multi_syllable]
     word = generate_multi_syllable_word
   elsif hash[:one_letter]
-    word = ONE_LETTER_WORDS_PROBABILITY_ARRAY.sample
+    word = [ONE_LETTER_WORDS_PROBABILITY_ARRAY.sample]
   else
-    word = generate_single_syllable_word
+    word = geneate_single_syllable_word
   end
 
-  word = add_dash(word) if hash[:dash]
+  word = add_dash(word) if hash[:dash] #########################################
 
   word #выдается слово
 end
@@ -183,7 +188,63 @@ end
 
 def geneate_single_syllable_word
   length = rand(20) < 15 ? rand(2..4) : rand(5..6)
-  vowel  = [1072, 1086, 1091, 1101, 1099, 1080, 1103, 1077, 1105, 1102].sample
-           [1073, 1074, 1075, 1076, 1078, 1079, 1082, 1083, 1084, 1085,
-            1087, 1088, 1089, 1090, 1092, 1093, 1094, 1095, 1096, 1097]
+  vowel  = VOWELS_PROBABILITY_ARRAY.sample
+  word   = Array.new(length)
+
+  case length
+  when 2
+    word[rand(2)] = vowel
+  when 3, 4
+    word[rand(1..2)] = vowel
+  when 5, 6
+    word[-2] = vowel
+  end
+
+
+  word.map! { |el| el ? el : CONSONANTS_PROBABILITY_ARRAY.sample }
+
+  word = manage_i_soft(word)
+
+  occasionally_add_softening_sign(word)
+
+# !ъьы в начале слова
+# в начале слова после !й всегла гласная
+# после !й в среедине слова определенные буквы
+# в 2 и 3 буквенных всегда гласная
+  # больше 2 гласных подряд нельзя
+# больше двух одинаковых согласных подряд нельзя
+# 5 или меньше согласных в односложных словах
 end
+
+def occasionally_add_softening_sign(arr) #######################################
+  arr
+end
+
+
+def manage_i_soft(arr) #########################################################
+  arr
+end
+
+
+def add_dash(arr) ##############################################################
+  arr
+end
+
+
+def generate_multi_syllable_word ###############################################
+ geneate_single_syllable_word + geneate_single_syllable_word
+end
+
+
+## !ъьы в начале слова
+## в начале слова после !й всегла гласная
+## после !й в среедине слова определенные буквы
+## в 2 и 3 буквенных всегда гласная
+## однобукв слова только некоторые
+# не оболее 4 согл подряд
+##больше 2 гласных подряд нельзя
+## больше двух одинаковых согласных подряд нельзя
+# в многослож словах не менее 40% гласных
+## 5 или меньше согласных в односложных словах
+# после !ъ яёюе
+# не более ..."should not allow a vowel add the beginning of the word in single-syllable words if they have 3 or more letters"
