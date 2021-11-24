@@ -1,3 +1,71 @@
+LETTERS_FREQ = { 1072 => 801,
+                 1073 => 159,
+                 1074 => 454,
+                 1075 => 170,
+                 1076 => 298,
+                 1077 => 749,
+                 1105 => 100,
+                 1078 => 94,
+                 1079 => 165,
+                 1080 => 735,
+                 1081 => 121,
+                 1082 => 349,
+                 1083 => 440,
+                 1084 => 321,
+                 1085 => 670,
+                 1086 => 1097,
+                 1087 => 281,
+                 1088 => 473,
+                 1089 => 547,
+                 1090 => 626,
+                 1091 => 262,
+                 1092 => 26,
+                 1093 => 97,
+                 1094 => 48,
+                 1095 => 144,
+                 1096 => 73,
+                 1097 => 36,
+                 1098 => 4,
+                 1099 => 190,
+                 1100 => 174,
+                 1101 => 32,
+                 1102 => 64,
+                 1103 => 201
+                }.freeze
+
+
+ONE_LETTER_WORDS_FREQ = { 1080 => 358,
+                          1074 => 314,
+                          1103 => 127,
+                          1089 => 113,
+                          1072 => 82,
+                          1082 => 54,
+                          1091 => 43,
+                          1086 => 34
+                        }.freeze
+
+
+
+def provide_disrtibution(hash)
+  sample_array = []
+  hash.each_key do |k|
+    hash[k].times do
+        sample_array << k
+    end
+  end
+
+  sample_array.freeze
+  sample_array
+end
+
+
+ONE_LETTER_WORDS_PROBABILITY_ARRAY = provide_disrtibution(ONE_LETTER_WORDS_FREQ)
+LETTERS_PROBABILITY_ARRAY          = provide_disrtibution(LETTERS_FREQ)
+
+
+
+
+
 def rl_str_gen #russian like strings generator
   base_string
 end
@@ -87,22 +155,18 @@ def make_common_word(hash)
 # не более ..."should not allow a vowel add the beginning of the word in single-syllable words if they have 3 or more letters"
 
 
-# :multi_syllable Многосложность
-
-# :one_letter     однобуквенность
-# :dash           дефис
 
   if hash[:multi_syllable]
     word = generate_multi_syllable_word
   elsif hash[:one_letter]
-    word = [1072, 1103, 1074, 1086, 1091, 1080, 1082, 1089].sample
+    word = ONE_LETTER_WORDS_PROBABILITY_ARRAY.sample
   else
     word = generate_single_syllable_word
   end
 
   word = add_dash(word) if hash[:dash]
 
-  word
+  word #выдается слово
 end
 
 
@@ -114,4 +178,12 @@ def digital_capitalize(arr)
   end
 
   arr
+end
+
+
+def geneate_single_syllable_word
+  length = rand(20) < 15 ? rand(2..4) : rand(5..6)
+  vowel  = [1072, 1086, 1091, 1101, 1099, 1080, 1103, 1077, 1105, 1102].sample
+           [1073, 1074, 1075, 1076, 1078, 1079, 1082, 1083, 1084, 1085,
+            1087, 1088, 1089, 1090, 1092, 1093, 1094, 1095, 1096, 1097]
 end
