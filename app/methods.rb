@@ -106,10 +106,10 @@ def plan_words
 
   arr.each do |el|
 
-    case rand(10)
+    case rand(20)
     when 0
       el[:case] = :acronym
-    when 1
+    when 1, 2
       el[:case] = :capital
     else
       el[:case] = :downcase
@@ -130,7 +130,6 @@ def plan_words
       end
     end
   end
-
 end
 
 
@@ -149,7 +148,6 @@ def words_gen(arr)
       digital_capitalize(make_common_word(el))
     end
   end
-
 end
 
 
@@ -160,7 +158,6 @@ end
 
 
 def make_common_word(hash)
-
   if hash[:multi_syllable]
     word = generate_multi_syllable_word
   elsif hash[:one_letter]
@@ -200,34 +197,76 @@ def geneate_single_syllable_word
     word[-2] = vowel
   end
 
-
   word.map! { |el| el ? el : CONSONANTS_PROBABILITY_ARRAY.sample }
 
-  word = manage_i_soft(word)
+  finalize_word(word)
+
+end
+
+def finalize_word(word)
+  word = check_some_consonance(word)
+
+  word = manage_i_short(word)
 
   occasionally_add_softening_sign(word)
-
-# !ъьы в начале слова
-# в начале слова после !й всегла гласная
-# после !й в среедине слова определенные буквы
-# в 2 и 3 буквенных всегда гласная
-  # больше 2 гласных подряд нельзя
-# больше двух одинаковых согласных подряд нельзя
-# 5 или меньше согласных в односложных словах
 end
+
+def check_some_consonance(arr) #################################################
+  arr
+end
+
 
 def occasionally_add_softening_sign(arr) #######################################
   arr
 end
 
 
-def manage_i_soft(arr) #########################################################
+def manage_i_short(arr) ########################################################
   arr
 end
 
 
-def add_dash(arr) ##############################################################
+def add_dash(arr)
+  return arr if arr.size < 5 or arr.size > 14
+
+  vowel_indexes = []
+
+  arr.each_with_index do |el, i|
+    vowel_indexes << i if VOWELS.any?(el)
+  end
+
+  dash_zone_borders =
+    [
+     vowel_indexes[0] == 0 ? 2 : vowel_indexes[0] + 1,
+     vowel_indexes[-1] == arr.size-1 ? vowel_indexes[-1] - 1 : vowel_indexes[-1]
+    ]
+
+    (dash_zone_borders[0]..dash_zone_borders[1]).map { |i|
+      next if arr[i] == 1100
+      # inseart
+      #не ь знак
+      #слева 3 согл
+      #этот и2 след согл
+      #2 и 2 по бокам согл
+      #
+      #
+      #
+    }
+
   arr
+end
+
+
+def get_no_insert_range(arr)
+  no_insert  = []
+  consonants = 0
+
+  arr.each_with_index do |el, i|
+    VOWELS.any?(el) ? consonants = 0 : consonants += 1
+    no_insert << ((i-3)..(i+1)) if consonants == 4
+  end
+
+  no_insert
 end
 
 
@@ -247,4 +286,5 @@ end
 # в многослож словах не менее 40% гласных
 ## 5 или меньше согласных в односложных словах
 # после !ъ яёюе
-# не более ..."should not allow a vowel add the beginning of the word in single-syllable words if they have 3 or more letters"
+# не более ..."should not allow a vowel add the beginning of the word in single
+#-syllable words if they have 3 or more letters"
