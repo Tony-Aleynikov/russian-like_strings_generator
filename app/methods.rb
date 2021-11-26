@@ -77,27 +77,12 @@ VOWELS_PROBABILITY_ARRAY     = provide_disrtibution(select_letters(VOWELS))
 CONSONANTS_PROBABILITY_ARRAY = provide_disrtibution(select_letters(CONSONANTS))
 
 
-
-
-
-
 def rl_str_gen #russian like strings generator
-  words_gen(plan_words).map { |a| a << 32 }.flatten[0..-2].pack("U*")
-end
+  words = words_gen(plan_words)
 
+  digital_capitalize(words[0])
+  words.map { |a| a << 32 }.flatten[0..-2].push(46).pack("U*")
 
-def base_string
-  x = [*1040..1103, 1105, 1025]
-  arr = Array.new(rand(3..250)) { x.sample }
-
-  index = rand(1..15)
-
-  while index < arr.size
-    arr[index] = 32
-    index += rand(2..16)
-  end
-
-  arr.pack("U*")
 end
 
 
@@ -166,7 +151,7 @@ def make_common_word(hash)
     word = geneate_single_syllable_word
   end
 
-  word = add_dash(word) if hash[:dash] #########################################
+  word = add_dash(word) if hash[:dash]
 
   word #выдается слово
 end
@@ -211,17 +196,17 @@ def finalize_word(word)
   occasionally_add_softening_sign(word)
 end
 
-def check_some_consonance(arr) #################################################
+def check_some_consonance(arr)
   arr
 end
 
 
-def occasionally_add_softening_sign(arr) #######################################
+def occasionally_add_softening_sign(arr)
   arr
 end
 
 
-def manage_i_short(arr) ########################################################
+def manage_i_short(arr)
   arr
 end
 
@@ -243,14 +228,6 @@ def add_dash(arr)
 
     (dash_zone_borders[0]..dash_zone_borders[1]).map { |i|
       next if arr[i] == 1100
-      # inseart
-      #не ь знак
-      #слева 3 согл
-      #этот и2 след согл
-      #2 и 2 по бокам согл
-      #
-      #
-      #
     }
 
   arr
@@ -270,21 +247,7 @@ def get_no_insert_range(arr)
 end
 
 
-def generate_multi_syllable_word ###############################################
+def generate_multi_syllable_word
  geneate_single_syllable_word + geneate_single_syllable_word
 end
 
-
-## !ъьы в начале слова
-## в начале слова после !й всегла гласная
-## после !й в среедине слова определенные буквы
-## в 2 и 3 буквенных всегда гласная
-## однобукв слова только некоторые
-# не оболее 4 согл подряд
-##больше 2 гласных подряд нельзя
-## больше двух одинаковых согласных подряд нельзя
-# в многослож словах не менее 40% гласных
-## 5 или меньше согласных в односложных словах
-# после !ъ яёюе
-# не более ..."should not allow a vowel add the beginning of the word in single
-#-syllable words if they have 3 or more letters"

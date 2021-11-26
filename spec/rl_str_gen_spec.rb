@@ -1,22 +1,29 @@
 require "rspec"
 require_relative "../app/methods"
 
-describe "get_no_insert_range" do
+describe "get_no_insert_rangers" do
 
   it "should correctly find 4 consonants in a row groups" do
     1000.times do
-      word = Array.new(12) { rand(1072..1103)}
+      word = Array.new(rand(6..14)) { |i| [rand(1072..1103), i] }
 
-      check = word.chunk { |el| VOWELS.any?(el) }
+      check = word.chunk { |el| VOWELS.any?(el[0]) }
                   .to_a
-                  .select { |el| el[1].size > 3 && el[0] == false }
-                  .map { |el| el[1][0..3] }
+                  .select { |el| el[1].size > 2 and el[0] == false }
+                  .map { |el|
+                     group = el[1][0..3]
+                     i     = group[0][1]
+                     group.size == 3 ? [(i..i), ((i+3)..(i+3))] : (i..(i+4))
+                  }
+                  .flatten
 
-      test = get_no_insert_range(word).map { |r| word[r][0, 4] }
+      word = word.map { |el| el[0] }
+      test = get_no_insert_rangers(word).map { |r| word[r][0, 4] }
 
       expect(test).to eq(check)
     end
   end
+
 end
 
 
